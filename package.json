@@ -6,13 +6,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Russell Pollari",
+  "license": "MIT",
   "dependencies": {
     "chalk": "^2.4.2",
     "commander": "^2.19.0",
-    "mongoose": "^5.4.17",
-    "node-notifier": "^5.4.0"
+    "fs-extra": "^7.0.1"
   },
   "bin": {
     "current-task": "./cli.js"
