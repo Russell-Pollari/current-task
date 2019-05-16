@@ -4,9 +4,7 @@ const program = require('commander');
 const Task = require('./models/Task');
 const TaskList = require('./models/TaskList');
 
-const task_dir = '/home/russell/projects/current-task';
-const dir = process.cwd();
-console.log(dir);
+const task_dir = process.cwd();
 const taskList = new TaskList(task_dir);
 
 program

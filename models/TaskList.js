@@ -6,21 +6,27 @@ const Task = require('./Task');
 
 class TaskList {
 	constructor(dir) {
-		this.saveDir = dir;
 		this.currentTaskPath = `${dir}/currentTask.json`;
 		this.finishedTasksPath = `${dir}/previousTasks.json`;
 		this.toDosPath = `${dir}/todos.json`;
+
+		this.currentTask = null;
 		this.finishedTasks = [];
 		this.toDos = [];
-		this.currentTask = null;
 
 		this.load();
 	}
 
-	async load() {
-		this.loadTodos(this.toDosPath);
-		this.loadFinishedTasks(this.finishedTasksPath);
-		this.loadCurrentTask(this.currentTaskPath);
+	load() {
+		if (fs.existsSync(this.toDosPath)) {
+			this.loadTodos(this.toDosPath);
+		}
+		if (fs.existsSync(this.finishedTasksPath)) {
+			this.loadFinishedTasks(this.finishedTasksPath);
+		}
+		if (fs.existsSync(this.currentTaskPath)) {
+			this.loadCurrentTask(this.currentTaskPath);
+		}
 	}
 
 	loadCurrentTask(path) {
