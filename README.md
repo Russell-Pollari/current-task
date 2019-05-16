@@ -2,7 +2,7 @@
 
 CLI application for tracking tasks throughout the day
 
-![example][screenshot.png]
+![example](screenshot.png)
 
 ## Install
 - Clone this repo  
