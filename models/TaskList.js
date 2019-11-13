@@ -6,9 +6,10 @@ const Task = require('./Task');
 
 class TaskList {
 	constructor(dir) {
-		this.currentTaskPath = `${dir}/currentTask.json`;
-		this.finishedTasksPath = `${dir}/previousTasks.json`;
-		this.toDosPath = `${dir}/todos.json`;
+		this.dataDir = dir;
+		this.currentTaskPath = `${dir}/data/current.json`;
+		this.finishedTasksPath = `${dir}/data/today.json`;
+		this.toDosPath = `${dir}/data/todo.json`;
 
 		this.currentTask = null;
 		this.finishedTasks = [];
@@ -78,7 +79,7 @@ class TaskList {
 	save_day() {
 		const fileName = this.finishedTasks[0].startDate.toISOString().slice(0, 10);
 		const finishedTasksArray = this.finishedTasks.map(task => task.getObject());
-		fs.writeFileSync(`data/${fileName}`, JSON.stringify(finishedTasksArray, null, 2));
+		fs.writeFileSync(`${this.dataDir}/data/${fileName}.json`, JSON.stringify(finishedTasksArray, null, 2));
 	}
 
 	clear() {
