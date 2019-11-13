@@ -10,7 +10,7 @@ const { spawn } = require('child_process')
 const taskList = new TaskList(BASE_PATH);
 
 const edit = filename => {
-	const child = spawn('vim', [`${BASE_PATH}/${filename}`], {
+	const child = spawn('vim', [`${BASE_PATH}/data/${filename}`], {
 		stdio: 'inherit'
 	});
 
@@ -58,14 +58,14 @@ program
 	.command('edit [type]')
 	.action((type => {
 		switch(type) {
-			case 'todos':
-				edit('todos.json');
+			case 'todo':
+				edit('todo.json');
 				break;
 			case 'done':
-				edit('previousTasks.json');
+				edit('today.json');
 				break;
 			default:
-				edit('currentTask.json');
+				edit('current.json');
 		}
 	}))
 
