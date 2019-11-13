@@ -4,8 +4,20 @@ const program = require('commander');
 const Task = require('./models/Task');
 const TaskList = require('./models/TaskList');
 
-const task_dir = process.cwd();
-const taskList = new TaskList(task_dir);
+const BASE_PATH = '/home/russell/projects/current-task/';
+
+const { spawn } = require('child_process')
+const taskList = new TaskList(BASE_PATH);
+
+const edit = filename => {
+	const child = spawn('vim', [`${BASE_PATH}/${filename}`], {
+		stdio: 'inherit'
+	});
+
+	child.on('exit', (e) => {
+		console.log('edited', filename);
+	})
+}
 
 program
 	.command('set <title>')
@@ -35,11 +47,39 @@ program
 
 program
 	.command('pause')
-	.action(() => taskList.pause());
+	.option('-o <offset>')
+	.action((options) => taskList.pause(options.O));
 
 program
 	.command('note <note>')
 	.action((note) => taskList.addNote(note));
 
+program
+	.command('edit [type]')
+	.action((type => {
+		switch(type) {
+			case 'todos':
+				edit('todos.json');
+				break;
+			case 'done':
+				edit('previousTasks.json');
+				break;
+			default:
+				edit('currentTask.json');
+		}
+	}))
+
+program
+	.option('-a, --all', 'Show all tasks')
+
 program.parse(process.argv);
-taskList.show();
+
+if (program.all) {
+	taskList.show();
+} else {
+	if (taskList.currentTask) {
+		console.log(taskList.currentTask.getStyledString())
+	} else {
+		console.log('No task set');
+	}
+}

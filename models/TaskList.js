@@ -64,13 +64,21 @@ class TaskList {
 
 	save() {
 		const finishedTasksArray = this.finishedTasks.map(task => task.getObject());
-		fs.writeFileSync(this.finishedTasksPath, JSON.stringify(finishedTasksArray));
+		fs.writeFileSync(this.finishedTasksPath, JSON.stringify(finishedTasksArray, null, 2));
 
 		const todoArray = this.toDos.map(task => task.getObject());
-		fs.writeFileSync(this.toDosPath, JSON.stringify(todoArray));
+		fs.writeFileSync(this.toDosPath, JSON.stringify(todoArray, null, 2));
 
 		const taskObject = this.currentTask ? this.currentTask.getObject() : {};
-		fs.writeFileSync(this.currentTaskPath, JSON.stringify(taskObject));
+		fs.writeFileSync(this.currentTaskPath, JSON.stringify(taskObject, null, 2));
+
+		this.save_day();
+	}
+
+	save_day() {
+		const fileName = this.finishedTasks[0].startDate.toISOString().slice(0, 10);
+		const finishedTasksArray = this.finishedTasks.map(task => task.getObject());
+		fs.writeFileSync(`data/${fileName}`, JSON.stringify(finishedTasksArray, null, 2));
 	}
 
 	clear() {
@@ -113,7 +121,7 @@ class TaskList {
 	}
 
 	setCurrentTask(title, type, offset = 0) {
-		const startedAt = new Date(new Date() - 1000 * 60 * offset);
+		const startedAt = new Date(Date.now() - 1000 * 60 * offset);
 		try {
 			const index = Number(title);
 			this.currentTask = new Task({
@@ -141,26 +149,39 @@ class TaskList {
 	}
 
 	addNote(message) {
-		this.currentTask.addNote(message);
+		if (!this.currentTask) {
+			this.currentTask = new Task({
+				title: '',
+				type: 'note',
+				notes: [{ date: new Date(), message }]
+			});
+			this.done();
+		} else {
+			this.currentTask.addNote(message);
+		}
 		this.save();
 	}
 
-	pause() {
+	pause(offset = 0) {
+		const finishedAt = new Date(new Date() - 1000 * 60 * offset);
 		if (!this.currentTask) {
 			console.error('No task set');
 		}
-		this.currentTask.pause();
+
+		this.currentTask.pause(finishedAt);
 		this.finishedTasks.push(this.currentTask);
-		this.currentTask.clearNotes();
-		this.toDos.push(this.currentTask);
+
+		this.toDos.push(new Task(({ ...this.currentTask.getObject(), notes: [] })));
 		this.currentTask = null;
 		this.save();
 	}
 
 	showTypeBreakdown() {
+		let totalTime = 0;
 		const typeSummary = {};
 		this.finishedTasks.forEach(task => {
 			const type = task.getType();
+			totalTime = totalTime + task.getMinutes();
 			typeSummary[type] = (typeSummary[type] || 0) + task.getMinutes();
 		});
 		const typeSummaryArray = Object.keys(typeSummary).map(type => ({
@@ -169,7 +190,9 @@ class TaskList {
 		}));
 
 		typeSummaryArray.sort((a, b) => b.minutes - a.minutes);
-		console.log(chalk.bold.underline('\nSummary'));
+		const totalMinuteString = `[${chalk.cyan(totalTime < 10 ? `0${totalTime} mins` : `${totalTime} mins`)}]`;
+		const hourString = `(${(totalTime / 60).toFixed(2)} hrs)`;
+		console.log(chalk.bold.underline('\nSummary'), totalMinuteString, hourString);
 
 		typeSummaryArray.forEach(({ label, minutes }) => {
 			const barLength = Math.round(minutes / 2);

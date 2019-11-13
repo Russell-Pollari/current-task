@@ -9,6 +9,7 @@
   "author": "Russell Pollari",
   "license": "MIT",
   "dependencies": {
+    "@types/node": "^12.6.8",
     "chalk": "^2.4.2",
     "commander": "^2.19.0",
     "fs-extra": "^7.0.1"

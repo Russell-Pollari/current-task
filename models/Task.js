@@ -1,8 +1,6 @@
 const fs = require('fs');
 const chalk = require('chalk');
 
-BASE_PATH = '/home/russell/projects/current-task/';
-
 class Task {
 	constructor(options) {
 		this.defaultOptions = {
@@ -46,8 +44,8 @@ class Task {
 		this.task.notes = [];
 	}
 
-	pause() {
-		this.task.endedAt = new Date();
+	pause(endedAt) {
+		this.task.endedAt = endedAt || new Date();
 	}
 
 	getObject () {
